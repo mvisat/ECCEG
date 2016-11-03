@@ -17,4 +17,8 @@ public class Pair<L,R> {
         return left.equals(pair.left) && right.equals(pair.right);
     }
 
+    @Override
+    public String toString() {
+        return "<" + left.toString() + ", " + right.toString() + ">";
+    }
 }

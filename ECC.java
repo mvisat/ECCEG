@@ -2,7 +2,7 @@ import java.math.BigInteger;
 
 public class ECC {
     public final BigInteger a, b, p;
-    private BigInteger k = BigInteger.valueOf(30);
+    private BigInteger k = BigInteger.valueOf(20);
     private static BigInteger
         MINUS_ONE = BigInteger.valueOf(-1),
         ZERO = BigInteger.valueOf(0),
@@ -68,24 +68,22 @@ public class ECC {
             BigInteger x = mk.add(i);
             BigInteger y = solveY(x);
             if (y != null)
-                return new Point (x, y);
+                return new Point (x.mod(p), y.mod(p));
         }
         return new Point(BigInteger.valueOf(-1), BigInteger.valueOf(-1));
     }
 
-    public Point getBasePoint() {
-        boolean found = false;
-        BigInteger x = ZERO;
-        while(!found && x.compareTo(this.p) < 0){
-            BigInteger y = solveY(x);
-            if(y != null) return new Point(x,y);
-            x = x.add(ONE);
-        }
-        return null;
-    }
-
     public BigInteger pointToInt(Point p) {
         return p.x.subtract(ONE).divide(this.k);
+    }
+
+    public Point getBasePoint() {
+        for (BigInteger x = ZERO; x.compareTo(this.p) < 0; x = x.add(ONE)) {
+            BigInteger y = solveY(x);
+            if (y != null)
+                return new Point(x, y);
+        }
+        return null;
     }
 
     // Helper class for square root mod

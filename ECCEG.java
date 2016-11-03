@@ -1,17 +1,16 @@
 import java.math.BigInteger;
-import java.util.Random;
+import java.util.*;
 
 public class ECCEG {
     private Point publicKey;
     private BigInteger privateKey;
     private Point basePoint;
     private ECC ECC;
-    public static final int BIT_LENGTH = 256;
 
     public ECCEG(ECC ECC, Point basePoint) {
         this.ECC = ECC;
         this.basePoint = basePoint;
-        this.privateKey = new BigInteger(BIT_LENGTH, new Random())
+        this.privateKey = new BigInteger(ECC.p.bitLength(), new Random())
             .mod(ECC.p.subtract(BigInteger.ONE))
             .add(BigInteger.ONE);
         this.publicKey = ECC.multiply(privateKey, basePoint);
@@ -29,9 +28,8 @@ public class ECCEG {
     public ECC getECC() { return this.ECC; }
     public Point getBasePoint() { return this.basePoint; }
 
-    public Pair<Point, Point> encrypt(BigInteger x) {
-        Point p = ECC.intToPoint(x);
-        BigInteger k = new BigInteger(BIT_LENGTH, new Random())
+    public Pair<Point, Point> encrypt(Point p) {
+        BigInteger k = new BigInteger(ECC.p.bitLength(), new Random())
             .mod(ECC.p.subtract(BigInteger.ONE))
             .add(BigInteger.ONE);
         Point left = ECC.multiply(k, basePoint);
@@ -39,9 +37,22 @@ public class ECCEG {
         return new Pair<Point, Point>(left, right);
     }
 
-    public BigInteger decrypt(Pair<Point, Point> p) {
-        Point m = ECC.multiply(ECC.b, p.left);
-        Point d = ECC.subtract(p.right, m);
-        return ECC.pointToInt(d);
+    public List<Pair<Point, Point>> encryptBytes(byte[] bytes) {
+        List<Pair<Point, Point>> ret = new ArrayList<>();
+        for (int i = 0; i < bytes.length; ++i)
+            ret.add(encrypt(ECC.intToPoint(BigInteger.valueOf(bytes[i]))));
+        return ret;
+    }
+
+    public Point decrypt(Pair<Point, Point> p) {
+        Point m = ECC.multiply(privateKey, p.left);
+        return ECC.subtract(p.right, m);
+    }
+
+    public List<Point> decrypt(List<Pair<Point, Point>> l) {
+        List<Point> ret = new ArrayList<>();
+        for (Pair<Point, Point> p: l)
+            ret.add(decrypt(p));
+        return ret;
     }
 }
