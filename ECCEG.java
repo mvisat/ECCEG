@@ -29,7 +29,7 @@ public class ECCEG {
     public ECC getECC() { return this.ECC; }
     public Point getBasePoint() { return this.basePoint; }
 
-    public Pair<Point, Point> encrypt(Point publicKey, BigInteger x) {
+    public Pair<Point, Point> encrypt(BigInteger x) {
         Point p = ECC.intToPoint(x);
         BigInteger k = new BigInteger(BIT_LENGTH, new Random())
             .mod(ECC.p.subtract(BigInteger.ONE))
