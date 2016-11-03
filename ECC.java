@@ -1,7 +1,7 @@
 import java.math.BigInteger;
 
 public class ECC {
-    private BigInteger a, b, p;
+    public final BigInteger a, b, p;
     private BigInteger k = BigInteger.valueOf(30);
     private static BigInteger
         MINUS_ONE = BigInteger.valueOf(-1),
