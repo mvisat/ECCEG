@@ -57,8 +57,9 @@ public class ECC {
             return add(multiply(n.subtract(ONE), p), p);
     }
 
-    private BigInteger solveY(BigInteger x) {
-        return SquareRootModulo.sqrtP(x.multiply(x).multiply(x).add(this.a.multiply(x)).add(this.b).mod(this.p), this.p);
+    public BigInteger solveY(BigInteger x) {
+        BigInteger y2 = x.multiply(x).multiply(x).add(a.multiply(x)).add(b).mod(p);
+        return SquareRootModulo.sqrtP(y2, p);
     }
 
     public Point intToPoint(BigInteger m) {
@@ -82,12 +83,12 @@ public class ECC {
             if (p.mod(TWO).equals(ZERO))
                 return null;
             BigInteger q = p.subtract(ONE).divide(TWO);
-            if (x.modPow(q, p).equals(ONE))
+            if (!x.modPow(q, p).equals(ONE))
                 return null;
 
             while (q.mod(TWO).equals(ZERO)) {
                 q = q.divide(TWO);
-                if (x.modPow(q, p).equals(ONE))
+                if (!x.modPow(q, p).equals(ONE))
                     return complexSqrtP(x, q, p);
             }
             q = q.add(ONE).divide(TWO);
@@ -97,7 +98,7 @@ public class ECC {
         private static BigInteger complexSqrtP(BigInteger x, BigInteger q, BigInteger p) {
             BigInteger a = findNonResidue(p);
             if (a == null) return null;
-            BigInteger t = (p.subtract(ONE)).divide(TWO);
+            BigInteger t = p.subtract(ONE).divide(TWO);
             BigInteger negativePower = t;
 
             while (q.mod(TWO).equals(ZERO)) {
@@ -119,6 +120,7 @@ public class ECC {
                 if (a.modPow(q, p).equals(ONE))
                     return a;
                 a = a.add(ONE);
+                if (a.compareTo(p) >= 0) return null;
             }
         }
     }
