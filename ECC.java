@@ -16,7 +16,7 @@ public class ECC {
         this.p = p;
     }
 
-    private Point add(Point p, Point q) {
+    public Point add(Point p, Point q) {
         if (p.x.compareTo(q.x) == 0 && p.y.compareTo(q.y) == 0)
             return doubles(p);
         else if (p.infinite && q.infinite)
@@ -34,34 +34,34 @@ public class ECC {
         return new Point(x, y);
     }
 
-    private Point subtract(Point p, Point q) {
-        Point minusQ = new Point(q.x, q.y.multiply(MINUS_ONE).mod(this.p));
+    public Point subtract(Point p, Point q) {
+        Point minusQ = new Point(q.x, q.y.negate().mod(this.p));
         return add(p, minusQ);
     }
 
-    private Point doubles(Point a) {
+    public Point doubles(Point a) {
         BigInteger gradient = a.x.multiply(a.x).multiply(THREE).add(this.a).multiply(a.y.multiply(TWO).modInverse(this.p)).mod(this.p);
         BigInteger x = gradient.multiply(gradient).subtract(a.x.multiply(TWO)).mod(this.p);
         BigInteger y = gradient.multiply(a.x.subtract(x)).subtract(a.y).mod(this.p);
         return new Point(x, y);
     }
 
-    private Point multiply(BigInteger n, Point p) {
+    public Point multiply(BigInteger n, Point p) {
         if (n.equals(ZERO))
             return new Point(ZERO, ZERO);
         else if (n.equals(ONE))
             return p;
-        else if (a.mod(TWO).equals(ZERO))
+        else if (n.mod(TWO).equals(ZERO))
             return multiply(n.divide(TWO), doubles(p));
         else
-            return add(multiply(a.subtract(ONE), p), p);
+            return add(multiply(n.subtract(ONE), p), p);
     }
 
     private BigInteger solveY(BigInteger x) {
         return SquareRootModulo.sqrtP(x.multiply(x).multiply(x).add(this.a.multiply(x)).add(this.b).mod(this.p), this.p);
     }
 
-    private Point intToPoint(BigInteger m) {
+    public Point intToPoint(BigInteger m) {
         BigInteger mk = m.multiply(k);
         for (BigInteger i = ONE; i.compareTo(k) < 0; i = i.add(ONE)) {
             BigInteger x = mk.add(i);
@@ -72,7 +72,7 @@ public class ECC {
         return new Point(BigInteger.valueOf(-1), BigInteger.valueOf(-1));
     }
 
-    private BigInteger pointToInt(Point p) {
+    public BigInteger pointToInt(Point p) {
         return p.x.subtract(ONE).divide(this.k);
     }
 
