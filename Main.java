@@ -38,9 +38,13 @@ public class Main {
         System.out.println();
         fr.savePointsToFile("tes.txt.enc", enc);
 
+        ECCEG ecceg2 = new ECCEG(ecc, ecc.getBasePoint());
+        System.out.println("Load private key and public key");
+        ecceg2.loadPrivateKey("key.pri");
+        ecceg2.loadPublicKey("key.pub");
         List<Pair<Point,Point>> read_enc = fr.loadPointsFromFile("tes.txt.enc");
-        List<Point> read_dec = ecceg.decrypt(read_enc);
-        for (Point pp: dec) System.out.print((char)ecc.pointToInt(pp).byteValue());
+        List<Point> read_dec = ecceg2.decrypt(read_enc);
+        for (Point pp: read_dec) System.out.print((char)ecc.pointToInt(pp).byteValue());
         System.out.println();
     }
 }
