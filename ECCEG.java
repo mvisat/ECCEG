@@ -1,5 +1,6 @@
 import java.math.BigInteger;
 import java.util.*;
+import java.io.*;
 
 public class ECCEG {
     private Point publicKey;
@@ -27,6 +28,72 @@ public class ECCEG {
     public BigInteger getPrivateKey() { return this.privateKey; }
     public ECC getECC() { return this.ECC; }
     public Point getBasePoint() { return this.basePoint; }
+
+    public void setPublicKey(Point publicKey) { this.publicKey = publicKey; }
+    public void setPrivateKey(BigInteger privateKey) { this.privateKey = privateKey; }
+
+    public boolean savePublicKey(String fileName) {
+        try {
+            File file = new File(fileName);
+            if (!file.exists()) file.createNewFile();
+            FileOutputStream fop = new FileOutputStream(file);
+            fop.write(publicKey.x.toString().getBytes());
+            fop.write(' ');
+            fop.write(publicKey.y.toString().getBytes());
+            fop.flush();
+            fop.close();
+            return true;
+        } catch (IOException e) {
+        }
+        return false;
+    }
+
+    public boolean savePrivateKey(String fileName) {
+        try {
+            File file = new File(fileName);
+            if (!file.exists()) file.createNewFile();
+            FileOutputStream fop = new FileOutputStream(file);
+            fop.write(privateKey.toString().getBytes());
+            fop.flush();
+            fop.close();
+            return true;
+        } catch (IOException e) {
+        }
+        return false;
+    }
+
+    public boolean loadPublicKey(String fileName) {
+        try {
+            File file = new File(fileName);
+            Scanner sc = new Scanner(file);
+            BigInteger x = null, y = null;
+            if (sc.hasNextBigInteger()) x = sc.nextBigInteger();
+            if (sc.hasNextBigInteger()) y = sc.nextBigInteger();
+            sc.close();
+            if (x != null && y != null) {
+                this.publicKey = new Point(x, y);
+                return true;
+            }
+        } catch (IOException e) {
+        }
+        return false;
+    }
+
+    public boolean loadPrivateKey(String fileName) {
+        try {
+            File file = new File(fileName);
+            Scanner sc = new Scanner(file);
+            BigInteger i = null;
+            if (sc.hasNextBigInteger()) i = sc.nextBigInteger();
+            sc.close();
+            if (i != null) {
+                this.privateKey = i;
+                return true;
+            }
+        } catch (IOException e) {
+        }
+        return false;
+    }
 
     public Pair<Point, Point> encrypt(Point p) {
         BigInteger k = new BigInteger(ECC.p.bitLength(), new Random())
