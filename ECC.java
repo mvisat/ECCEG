@@ -73,6 +73,17 @@ public class ECC {
         return new Point(BigInteger.valueOf(-1), BigInteger.valueOf(-1));
     }
 
+    public Point getBasePoint() {
+        boolean found = false;
+        BigInteger x = ZERO;
+        while(!found && x.compareTo(this.p) < 0){
+            BigInteger y = solveY(x);
+            if(y != null) return new Point(x,y);
+            x = x.add(ONE);
+        }
+        return null;
+    }
+
     public BigInteger pointToInt(Point p) {
         return p.x.subtract(ONE).divide(this.k);
     }
